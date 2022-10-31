@@ -31,3 +31,5 @@ En el contexto global que nos encontramos, viviendo las secuelas de una pandemia
 Por ello nace esta aplicación, para **minimizar el precio en la factura de la luz**. Cada noche, sobre las 20 horas, se publica el precio que tendrá el Kilovatio-hora en cada uno de los tramos del día siguiente, como el ejemplo en la siguiente figura.
 
 El objetivo principalmente pasa por saber cuándo son los tramos, durante cuanto tiempo, tendencias, etc. Para poder planificar el uso de los electrodomésticos más pesados como pueden ser lavadoras, lavavajillas o sistemas de climatización. Sirviendo de base a las tareas de automatización, con el beneficio de ser más eficientes.
+
+![](./docs/img/evolucion.png)
