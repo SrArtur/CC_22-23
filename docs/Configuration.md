@@ -2,8 +2,6 @@
 
 En este documento se describe el proceso de la configuración de seguridad de git y Github siguiendo y atendiendo las indicaciones detalladas en [Hito 0: Descripción del problema a resolver usando correctamente git y GitHub](http://jj.github.io/CC/documentos/proyecto/0.Repositorio).
 
-
-
 ## Autenticación en dos pasos. 2FA
 
 Para incrementar la seguridad de nuestra cuenta de Github 
@@ -16,7 +14,7 @@ Para ello es necesario ir al apartado *Settings* y a continuación, *Two-Factor 
  el número de teléfono. Una vez terminado este proceso correctamente, ya tendríamos 
 nuestra cuenta más segura. 
 
-![](https://raw.githubusercontent.com/SrArtur/CC-22-23/main/docs/img/2FA.png)
+![](../docs/img/2FA.png)
 
 ## Edición del perfil
 
@@ -43,5 +41,3 @@ The key's randomart image is:
 ```
 
 Una vez tengamos el par de claves creados, el siguiente paso es añadir  el contenido de nuestra clave pública a Github. Lo podemos hacer en el apartado *SSH and GPG Keys* del apartado *Settings*.
-
-
