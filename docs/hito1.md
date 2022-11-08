@@ -1,4 +1,4 @@
-HITO 1 - Concretando y planificando el proyecto.
+# HITO 1 - Concretando y planificando el proyecto.
 
 Este hito tiene el objetivo de definir el proyecto así como su organización en hitos e historias de usuario que describan los diferentes roles, para ir obteniendo productos mínimos viables hasta el desarrollo completo de la aplicación siguiendo con detalle la [documentación correspondiente al hito 1.](http://jj.github.io/CC/documentos/proyecto/1.Infraestructura.html)
 
