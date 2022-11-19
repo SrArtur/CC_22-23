@@ -1,10 +1,10 @@
 import requests
-from config_testing import ID_PENINSULA, URL, HEADERS, DB_URI, DB_NAME
+from src.config import ID_PENINSULA, URL, HEADERS, DB_URI, DB_NAME
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import create_database, database_exists
-from LightPrices import LightPrices
+from src.LightPrices import LightPrices
 
 
 def parse_date(date, simplify: bool = False):
