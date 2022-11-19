@@ -1,13 +1,19 @@
 import requests
-from config import ID_PENINSULA, URL, HEADERS
+from config_testing import ID_PENINSULA, URL, HEADERS, DB_URI, DB_NAME
+from sqlalchemy import create_engine, Integer, JSON, Column, Sequence
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy_utils import create_database, database_exists
+from LightPrices import LightPrices
 
 
-def parse_date(date):
+def parse_date(date, simplify: bool = False):
     year = date[:4]
     month = date[5:7]
     day = date[8:10]
     hour = date[11:13]
-    date = {"year": year, "month": month, "day": day, "hour": hour}
+    date = {"year": year, "month": month, "day": day, "hour": hour} if not simplify else {"month": month, "day": day,
+                                                                                          "hour": hour}
     return date
 
 
@@ -49,4 +55,24 @@ def get_today_prices(db_format: bool, ):
             res[day + month + year] = hours
             prices = res
 
+            # TODO Simplificar la salida para el adaptarlo a API
+
     return prices
+
+
+def save_prices(prices: dict):
+    if not database_exists(DB_URI + "/" + DB_NAME):
+        engine = create_engine(DB_URI, echo=True)
+        engine.execute("CREATE DATABASE  {0}".format(DB_NAME))  # create db
+        print("Entra ")
+    engine = create_engine(DB_URI + "/" + DB_NAME, echo=True)
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    LightPrices.metadata.create_all(engine)
+    data = LightPrices()
+    # TODO Mejora la forma adaptada a la bd
+    data.day = list(prices.keys())[0]
+    data.day_prices = list(prices.values())[0]
+    session.add(data)
+    session.commit()
+
