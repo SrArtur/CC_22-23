@@ -76,3 +76,10 @@ def save_prices(prices: dict):
     session.add(data)
     session.commit()
 
+
+def get_prices(day):
+    engine = create_engine(DB_URI + "/" + DB_NAME)
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    q = session.query(LightPrices).get(day)
+    return q.day_prices
