@@ -10,7 +10,7 @@ def parse_date(date, simplify: bool = False):
     year = date[:4]
     month = date[5:7]
     day = date[8:10]
-    hour = date[11:13]
+    hour = date[10:12]
     date = {"year": year, "month": month, "day": day, "hour": hour} if not simplify else {"month": month, "day": day,
                                                                                           "hour": hour}
     return date
