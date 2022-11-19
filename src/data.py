@@ -1,6 +1,6 @@
 import requests
 from config_testing import ID_PENINSULA, URL, HEADERS, DB_URI, DB_NAME
-from sqlalchemy import create_engine, Integer, JSON, Column, Sequence
+from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import create_database, database_exists
@@ -27,7 +27,7 @@ def convert_to_kwh(price):
     return round((price / 1000), 5)
 
 
-def get_today_prices(db_format: bool, ):
+def get_today_prices(db_format: bool = False, simplify: bool = False):
     """
     Obtiene los precios del día en transcurso. A partir de las 20:00 horas en España
     son los precios del día siguiente.
@@ -53,9 +53,7 @@ def get_today_prices(db_format: bool, ):
                 price = p[1]
                 hours[hour] = price
             res[day + month + year] = hours
-            prices = res
-
-            # TODO Simplificar la salida para el adaptarlo a API
+            prices = hours if simplify else res
 
     return prices
 
@@ -83,3 +81,7 @@ def get_prices(day):
     session = Session()
     q = session.query(LightPrices).get(day)
     return q.day_prices
+
+
+if __name__ == '__main__':
+    print(get_today_prices(simplify=True, db_format=True))
