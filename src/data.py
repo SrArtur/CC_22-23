@@ -27,7 +27,7 @@ def convert_to_kwh(price):
     return round((price / 1000), 5)
 
 
-def get_today_prices(db_format: bool = False, simplify: bool = False):
+def get_today_prices(db_format: bool = True, simplify: bool = False):
     """
     Obtiene los precios del día en transcurso. A partir de las 20:00 horas en España
     son los precios del día siguiente.
@@ -62,7 +62,7 @@ def save_prices(prices: dict):
     if not database_exists(DB_URI + "/" + DB_NAME):
         engine = create_engine(DB_URI, echo=True)
         engine.execute("CREATE DATABASE  {0}".format(DB_NAME))  # create db
-        print("Entra ")
+        print("Bases de dato creada.")
     engine = create_engine(DB_URI + "/" + DB_NAME, echo=True)
     Session = sessionmaker(bind=engine)
     session = Session()
@@ -81,7 +81,3 @@ def get_prices(day):
     session = Session()
     q = session.query(LightPrices).get(day)
     return q.day_prices
-
-
-if __name__ == '__main__':
-    print(get_today_prices(simplify=True, db_format=True))
