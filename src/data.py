@@ -8,11 +8,24 @@ import datetime
 
 
 def today_day():
+    """
+    Obtiene el día de hoy con el formato almacenado en la base de datos.
+
+    :return: Dia en formato [dia][mes][año]
+    """
     today = datetime.datetime.now()
     return str(today.day) + str(today.month) + str(today.year)
 
 
 def parse_date(date, simplify: bool = False):
+    """
+    Cambia el formato de la fecha obtenida desde la API.
+    El formato puede ser: {año,mes,dia,hora} ó {mes, dia, hora} si simplify
+
+    :param date: Fecha
+    :param simplify: Flag para simplificar la fecha para el usuario
+    :return: Fecha en el formato indicado
+    """
     year = date[:4]
     month = date[5:7]
     day = date[8:10]
@@ -65,6 +78,13 @@ def get_today_prices(db_format: bool = True, simplify: bool = False):
 
 
 def save_prices(prices: dict):
+    """
+    Almacena en la base de datos los precios que recibe como atributo.
+
+    :param prices: Diccionario con los precios del día de hoy.
+    :return: None
+    """
+
     if not database_exists(DB_URI + "/" + DB_NAME):
         engine = create_engine(DB_URI, echo=True)
         engine.execute("CREATE DATABASE  {0}".format(DB_NAME))  # create db
@@ -85,6 +105,12 @@ def save_prices(prices: dict):
 
 
 def get_prices(day: str):
+    """
+    Consulta el precio de la luz el día especificado por parámetros.
+
+    :param day: Día a consultar.
+    :return: Diccionario con los precios del día especificados en day
+    """
     try:
         engine = create_engine(DB_URI + "/" + DB_NAME)
         Session = sessionmaker(bind=engine)
