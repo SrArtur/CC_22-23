@@ -4,6 +4,8 @@ Bienviendo a la página principal del proyecto **SmartGrid** para la asignatura 
 
 <img title="" src="docs/img/logo.png" alt="" data-align="center" width="120">
 
+El estado actual del proyecto puede ver en [Milestones](https://github.com/SrArtur/CC_22-23/milestones).
+
 ---
 
 ## Enlaces de interés
@@ -14,46 +16,49 @@ En la documentación del proyecto podemos encontrar actualmente la siguiente inf
 
 - [Descripción del proyecto](https://github.com/SrArtur/CC_22-23/blob/main/docs/hio0.md).
 
-- [Planificación del proyecto.](https://github.com/SrArtur/CC_22-23/blob/main/docs/hito1.md) (También disponible a continuación)
+- [Planificación del proyecto.](https://github.com/SrArtur/CC_22-23/blob/main/docs/hito1.md) 
+
+- [Test.](https://github.com/SrArtur/CC_22-23/blob/main/docs/hito2.md) (También disponible a continuación)
 
 ----
 
-## HITO 1 - Concretando y planificando el proyecto.
+### HITO 2 - Test
 
-Este hito tiene el objetivo de definir el proyecto así como su organización en hitos e historias de usuario que describan los diferentes roles, para ir obteniendo productos mínimos viables hasta el desarrollo completo de la aplicación siguiendo con detalle la [documentación correspondiente al hito 1.](http://jj.github.io/CC/documentos/proyecto/1.Infraestructura.html)
+Este hito tiene el objetivo es añadir test y las tareas necesarias para su ejecución. Se ha seguido con detalle la documentación de [Segundo Hito: Test](http://jj.github.io/CC/documentos/proyecto/2.Tests.html), [Preparando los tests unitarios](https://jj.github.io/curso-tdd/temas/tests-unitarios-organizaci%C3%B3n.html) y [Gestores de tareas y su importancia en automatización del desarrollo](https://jj.github.io/curso-tdd/temas/gestores-tareas.html)
 
-## Hitos de SmartGrid
+## Gestor de tareas
 
-- [Hito 0: Obtención y limpieza de datos.](https://github.com/SrArtur/CC_22-23/milestone/1)
+Como gestor de tareas se ha decidido usar `Make` debido a la familiaridad de uso con él. Ademas es posible usarlo fácilmente tanto en Windows (con WSL) como con Ubuntu. El contenido de `Makefile` es el siguiente:S
 
-- [Hito 1: Consultas y métricas.](https://github.com/SrArtur/CC_22-23/milestone/2)
+```makefile
+run:
+        python -m unittest discover
+```
 
-- [Hito 2: Generación de informes.](https://github.com/SrArtur/CC_22-23/milestone/3)
+## Biblioteca de aserciones y marco de pruebas
 
-- [Hito 3: Automatización.](https://github.com/SrArtur/CC_22-23/milestone/4)
+Para las comprobaciones del código se ha decidido usar `unittest` debido a que es el que viene por defecto con Python y por tanto, tiene muy buena integración con este lenguaje así como de los recursos disponibles. `unittest` es tanto marco de prueba como biblioteca de aserciones y está basado en el marco XUnit. Las partes del código testeadas, se describen más abajo.
 
-## Roles
+## YAML
 
-- :man_technologist:**Product Owner**:woman_technologist:: Lleva a cabo las funciones de un administrador. Se encarga de la creación de la base de datos, de volcar los datos diariamente en la base de datos, de la generación de informes, métricas útiles para los usuarios y la actualizaciones de la aplicación.
+El contenido del fichero YAML es el siguiente. Se especifica el lenguaje, las versiones en que es compatible, así como instalar los requerimientos y ejecutar los test (más adelante, ahora mismo es con `Make`.)
 
-- :standing_person:**User** :standing_woman:: Tiene acceso a la información generada (más detalles en las historias de usuarios (link aqui) y puede planificar o crear rutinas con sus electrodomésticos a partir de dicha información así como consultas concretas que crea oportuna.
+```yaml
+language: python
+python:
+  - "3.7"
+  - "3.8"
+  - "3.9"
+install:
+  - pip install -r requirements.txt
+script:
+  - python -m unittest discover
+```
 
-## Historias de usuario
+## Partes del código testeadas
 
-- [**HU1**](https://github.com/SrArtur/CC_22-23/issues/1):  Como *product owner* de la aplicación, quiero obtener la información de los precios de la luz desde que se implantó para generar métricas y estadísitcas globales.
+Las partes del código testeadas por ahora, son las correspondientes a los avances en el Hito 0. Más concretamente, las llamadas a la API y base datos, así como el formateo y la conversión de diferentes datos. Los test se pueden encontrar en los siguientes enlaces:
 
-- [**HU2**](https://github.com/SrArtur/CC_22-23/issues/2): Como *product owner*, necesito la limpieza y tratamiento de los datos para poder ofrecer al usuario la información mas limpia y sencilla posible para su correcta interpretación.
+- Test de datos
 
-- [**HU3**](https://github.com/SrArtur/CC_22-23/issues/3): Como *product owner* de la aplicación, necesito la automatización de los procesos de obtención y limpieza de datos para reducir posibles errores y entregar los datos al usuario lo antes posible.
-
-- [**HU4**](https://github.com/SrArtur/CC_22-23/issues/4)*: Como *user* quiero encender los electrodomésticos en las 'horas más baratas' para ahorrar dinero en la factura de la luz a final de mes.
-
-- [**HU5**](https://github.com/SrArtur/CC_22-23/issues/5): Como *user* me gustaría saber si es recomdable encender los electrodomésticos 'hoy' para poder planificarme las tareas.
-
-- [**HU6**](https://github.com/SrArtur/CC_22-23/issues/6): Como *user* me gustaría que se encendieran automaticamente los electrodomésticos que tengan la capacidad, en las horas más baratas para evitar tener que estar pendiente.
-
-- [**HU7**](https://github.com/SrArtur/CC_22-23/issues/7): Como *user* quiero ver la evolución del precio de la luz a lo largo del día que solicite para la planificación de mis tareas.
-
-## ***Issues***
-
-Cada uno de los *issues* han sido asignados al desarrollador, especificado la tarea y sus etiquetas así como a la historia de usuario correspondiente.
+- Test de base de datos
