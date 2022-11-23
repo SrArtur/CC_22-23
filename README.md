@@ -59,6 +59,6 @@ script:
 
 Las partes del código testeadas por ahora, son las correspondientes a los avances en el Hito 0. Más concretamente, las llamadas a la API y base datos, así como el formateo y la conversión de diferentes datos. Los test se pueden encontrar en los siguientes enlaces:
 
-- Test de datos
+- [Test de datos](https://github.com/SrArtur/CC_22-23/blob/main/test/test_data.py)
 
-- Test de base de datos
+- [Test de base de datos](https://github.com/SrArtur/CC_22-23/blob/main/test/test_database.py)
