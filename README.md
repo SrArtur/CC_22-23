@@ -28,7 +28,7 @@ Este hito tiene el objetivo es añadir test y las tareas necesarias para su ejec
 
 ## Gestor de tareas
 
-Como gestor de tareas se ha decidido usar `Make` debido a la familiaridad de uso con él. Ademas es posible usarlo fácilmente tanto en Windows (con WSL) como con Ubuntu. El contenido de `Makefile` es el siguiente:S
+Como gestor de tareas se ha decidido usar `Make` debido a la familiaridad de uso con él. Ademas es posible usarlo fácilmente tanto en Windows (con WSL) como con Ubuntu. El contenido de `Makefile` es el siguiente:
 
 ```makefile
 run:

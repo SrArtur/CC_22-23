@@ -1,6 +1,6 @@
 # HITO 2 - Test
 
-Este hito tiene el objetivo es añadir test y las tareas necesarias para su ejecución. Se ha seguido con detalle la documentación de [Segundo Hito: Test](http://jj.github.io/CC/documentos/proyecto/2.Tests.html), [Preparando los tests unitarios](https://jj.github.io/curso-tdd/temas/tests-unitarios-organizaci%C3%B3n.html) y [Gestores de tareas y su importancia en automatización del desarrollo
+Este hito tiene el objetivo es añadir test y las tareas necesarias para su ejecución. Se ha seguido con detalle la documentación de [Segundo Hito: Test](http://jj.github.io/CC/documentos/proyecto/2.Tests.html), [Preparando los tests unitarios](https://jj.github.io/curso-tdd/temas/tests-unitarios-organizaci%C3%B3n.html) y [Gestores de tareas y su importancia en automatización del desarrollo](https://jj.github.io/curso-tdd/temas/gestores-tareas.html)
 
 ## Gestor de tareas
 
