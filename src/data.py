@@ -53,26 +53,32 @@ def get_today_prices(db_format: bool = True, simplify: bool = False):
     :param db_format: Si se desea el tipado de los datos para almacenar en la base de datos
     :return: prices: precios del día.
     """
-    # TODO Almecenar los datos al hacer la primera llamada.
-    response = requests.get(url=URL, headers=HEADERS)
-    if response.status_code == 200:
-        data = response.json()
-        prices = [(parse_date(x['datetime']), convert_to_kwh(x['value'])) for x in
-                  data['indicator']['values'] if
-                  x['geo_id'] == ID_PENINSULA]
 
-        if db_format:
-            res = dict()
-            hours = dict()
-            for p in prices:
-                year = str(p[0]['year'])
-                month = str(p[0]['month'])
-                day = str(p[0]['day'])
-                hour = str(p[0]['hour'])
-                price = p[1]
-                hours[hour] = price
-            res[day + month + year] = hours
-            prices = hours if simplify else res
+    prices = get_prices(today_day())
+    if prices is not None:
+        print("La consulta es a la base de datos.")
+    else:
+        print("La consulta es a la API.")
+        response = requests.get(url=URL, headers=HEADERS)
+        if response.status_code == 200:
+            data = response.json()
+            prices = [(parse_date(x['datetime']), convert_to_kwh(x['value'])) for x in
+                      data['indicator']['values'] if
+                      x['geo_id'] == ID_PENINSULA]
+
+            if db_format:
+                res = dict()
+                hours = dict()
+                for p in prices:
+                    year = str(p[0]['year'])
+                    month = str(p[0]['month'])
+                    day = str(p[0]['day'])
+                    hour = str(p[0]['hour'])
+                    price = p[1]
+                    hours[hour] = price
+                res[day + month + year] = hours
+                save_prices(res)
+                prices = hours if simplify else res
 
     return prices
 
@@ -94,6 +100,7 @@ def save_prices(prices: dict):
     data.day = list(prices.keys())[0]
     data.day_prices = list(prices.values())[0]
     if get_prices(data.day) is None:
+        print(f"Se han almacenado lso precios del día {data.day}")
         engine = create_engine(DB_URI + "/" + DB_NAME, echo=True)
         Session = sessionmaker(bind=engine)
         session = Session()
@@ -119,3 +126,4 @@ def get_prices(day: str):
         return q.day_prices
     except AttributeError:
         print("La fecha solicitada no está disponible o el formato de fecha es incorrecto.")
+
