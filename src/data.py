@@ -10,7 +10,6 @@ import datetime
 def today_day():
     """
     Obtiene el día de hoy con el formato almacenado en la base de datos.
-
     :return: Dia en formato [dia][mes][año]
     """
     today = datetime.datetime.now()
@@ -21,9 +20,8 @@ def parse_date(date, simplify: bool = False):
     """
     Cambia el formato de la fecha obtenida desde la API.
     El formato puede ser: {año,mes,dia,hora} ó {mes, dia, hora} si simplify
-
     :param date: Fecha
-    :param simplify: Flag para simplificar la fecha para el usuario
+    :param simplify: Flag para simplificar la fecha para el usuario.
     :return: Fecha en el formato indicado
     """
     year = date[:4]
@@ -38,7 +36,6 @@ def parse_date(date, simplify: bool = False):
 def convert_to_kwh(price):
     """
     Hace la conversión de MWh a KWh.
-
     :param price: Precio en MWh.
     :return: Precio en KWh.
     """
@@ -49,8 +46,8 @@ def get_today_prices(db_format: bool = True, simplify: bool = False):
     """
     Obtiene los precios del día en transcurso. A partir de las 20:00 horas en España
     son los precios del día siguiente.
-
-    :param db_format: Si se desea el tipado de los datos para almacenar en la base de datos
+    :param simplify: Si se desea el formato más simplificado. Sólo horas y precios.
+    :param db_format: Si se desea el tipado de los datos para almacenar en la base de datos.
     :return: prices: precios del día.
     """
 
@@ -86,7 +83,6 @@ def get_today_prices(db_format: bool = True, simplify: bool = False):
 def save_prices(prices: dict):
     """
     Almacena en la base de datos los precios que recibe como atributo.
-
     :param prices: Diccionario con los precios del día de hoy.
     :return: None
     """
@@ -114,7 +110,6 @@ def save_prices(prices: dict):
 def get_prices(day: str):
     """
     Consulta el precio de la luz el día especificado por parámetros.
-
     :param day: Día a consultar.
     :return: Diccionario con los precios del día especificados en day
     """
@@ -133,7 +128,6 @@ def average_price(day: str = None):
     Calcula la media de los precios para el día especificado.
     En el caso de que no se proporcione día se sobreentiende
     que es el actual.
-
     :param day:
     :return: Precio medio del día
     """
@@ -153,7 +147,6 @@ def minimum_prices(day: str = None):
     Obtiene el y los precios más baratos del día. En el caso
     de que no se proporcione día se sobreentiende que es el
     actual.
-
     :param day: Día a consultar
     :return: precios y precio más baratos.
     """
@@ -180,7 +173,6 @@ def classify_prices(day: str = None):
     Clasifica los precios en valle,llano y punta.
     En el caso de que no se proporcione día se
     sobreentiende que es el actual.
-
     :param day: Día a consultar.
     :return: La clasificación de los precios.
     """
