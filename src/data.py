@@ -100,7 +100,7 @@ def save_prices(prices: dict):
     data.day = list(prices.keys())[0]
     data.day_prices = list(prices.values())[0]
     if get_prices(data.day) is None:
-        print(f"Se han almacenado lso precios del día {data.day}")
+        print(f"Se han almacenado los precios del día {data.day}")
         engine = create_engine(DB_URI + "/" + DB_NAME, echo=True)
         Session = sessionmaker(bind=engine)
         session = Session()
@@ -127,3 +127,77 @@ def get_prices(day: str):
     except AttributeError:
         print("La fecha solicitada no está disponible o el formato de fecha es incorrecto.")
 
+
+def average_price(day: str = None):
+    """
+    Calcula la media de los precios para el día especificado.
+    En el caso de que no se proporcione día se sobreentiende
+    que es el actual.
+
+    :param day:
+    :return: Precio medio del día
+    """
+    if day is None:
+        prices = get_today_prices(simplify=True)
+        arg = "hoy"
+    else:
+        prices = get_prices(day)
+        arg = "del día " + day
+    avg = round(sum([price for (hour, price) in prices.items()]) / len(prices), 4)
+    print(f"La media de {arg} es {avg}")
+    return avg
+
+
+def minimum_prices(day: str = None):
+    """
+    Obtiene el y los precios más baratos del día. En el caso
+    de que no se proporcione día se sobreentiende que es el
+    actual.
+
+    :param day: Día a consultar
+    :return: precios y precio más baratos.
+    """
+
+    if day is None:
+        prices = get_today_prices(simplify=True)
+        arg = "hoy"
+    else:
+        prices = get_prices(day)
+        arg = "del día " + day
+
+    avg = average_price(day)
+    minimum_p = {hour: round(price, 4) for hour, price in sorted(prices.items(), key=lambda item: item[1]) if
+                 price <= avg}
+    print(f"Los precios mínimos de {arg} es {minimum_p}")
+    minimum = list(minimum_p.items())[0]
+
+    print(f"El precio mínimo es a las {minimum[0]} con {minimum[1]}")
+    return minimum_p, minimum
+
+
+def classify_prices(day: str = None):
+    """
+    Clasifica los precios en valle,llano y punta.
+    En el caso de que no se proporcione día se
+    sobreentiende que es el actual.
+
+    :param day: Día a consultar.
+    :return: La clasificación de los precios.
+    """
+    if day is None:
+        prices = get_today_prices(simplify=True)
+    else:
+        prices = get_prices(day)
+
+    avg = average_price(day)
+    classification = {"valle": {}, "llano": {}, "punta": {}}
+
+    for (hour, price) in prices.items():
+        if price < avg - 0.01:
+            classification["valle"][hour] = price
+        elif avg - 0.01 <= price <= avg + 0.01:
+            classification["llano"][hour] = price
+        else:
+            classification["punta"][hour] = price
+
+    return classification
