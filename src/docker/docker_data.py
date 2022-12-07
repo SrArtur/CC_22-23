@@ -1,5 +1,5 @@
 import requests
-from config import ID_PENINSULA, URL, HEADERS
+from src.docker.config import ID_PENINSULA, URL, HEADERS
 import datetime
 
 
