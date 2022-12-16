@@ -5,6 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import create_database, database_exists
 from src.LightPrices import LightPrices
 import datetime
+import time
 
 
 def today_day():
@@ -193,3 +194,41 @@ def classify_prices(day: str = None):
             classification["punta"][hour] = price
 
     return classification
+
+
+def activation(current_hour: str = datetime.datetime.now().hour, minutes: int = datetime.datetime.now().minute):
+    """
+    Envía la señal de activación al dispositivo. En el caso de que no se establezca hora de activación, usará la actual.
+    En el caso, de que la hora no sea una de las más baratas, esperá hasta la siguiente hora más barata del mismo día.
+
+    :param current_hour: Hora especificada por el usuario o por defecto la actual
+    :param minutes: Minutos especificada por el usuario o por defecto el actual
+    :return: Señal de activación
+
+    """
+    min_prices, _ = minimum_prices()
+    activate = False
+    rest = None
+    current_hour = "0" + current_hour if len(current_hour) == 1 else current_hour
+
+    if current_hour in min_prices:
+        activate = True
+        print("Dispositivo activado.")
+        print(f"El precio del kwh actualmente es de {min_prices[current_hour]} ")
+    else:
+        for hour in min_prices.keys():
+            if int(current_hour) < int(hour):
+                rest = datetime.timedelta(hours=int(hour), minutes=0) - datetime.timedelta(hours=int(current_hour),
+                                                                                           minutes=int(minutes))
+                print(f"El dispositivo se activará dentro de {rest.seconds} segundos")
+                # time.sleep(rest.seconds)
+                time.sleep(3)
+                activate = True
+                print(f"El precio del kwh actualmente es de {min_prices[hour]} ")
+                print("Dispositivo activado.")
+                # La idea es activar la función del SDK de Alexa y/o Google Home.
+                break
+        if not rest:
+            print("Una hora más barata será al día siguiente")
+
+    return activate
