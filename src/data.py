@@ -1,11 +1,15 @@
-import requests
-from src.config import ID_PENINSULA, URL, HEADERS, DB_URI, DB_NAME
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy_utils import create_database, database_exists
-from src.LightPrices import LightPrices
 import datetime
 import time
+import matplotlib.pyplot as plt
+from scipy.interpolate import make_interp_spline, interp1d
+import numpy as np
+import requests
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy_utils import database_exists
+
+from src.LightPrices import LightPrices
+from src.config import ID_PENINSULA, URL, HEADERS, DB_URI, DB_NAME
 
 
 def today_day():
@@ -232,3 +236,38 @@ def activation(current_hour: str = datetime.datetime.now().hour, minutes: int = 
             print("Una hora más barata será al día siguiente")
 
     return activate
+
+
+def view_price(day: str = today_day(), trend: bool = False):
+    """
+    Representa gráficamente la evolución del precio a lo largo del día especificado
+    en day. En caso de que no se especifique, se sobreentiendo el día actual.
+
+    :param day: Día a representar
+    :param trend: Si se desea ver la tendencia global en vez del día
+    :return: None
+    """
+
+    prices = get_prices(day)
+    prices = [dict([int(a), float(x)] for a, x in prices.items())]
+    prices = prices[0].items()
+
+    x, y = zip(*prices)
+    x = np.asarray(x)
+    y = np.asarray(y)
+    interpolate = interp1d(x, y, kind="cubic")
+    x = np.linspace(x.min(), x.max(), 200)
+    y = interpolate(x)
+
+    plt.figure(figsize=(10, 6))
+
+    if trend:
+        ax = plt.gca()
+        ax.set_ylim([0, y.max() + 0.1])
+
+    title = "Evolución del precio. Día " + day
+    plt.title(title)
+    plt.xlabel("Hora")
+    plt.ylabel("Precio (céntimos)")
+    plt.plot(x, y)
+    plt.show()
