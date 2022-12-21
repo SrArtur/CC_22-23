@@ -5,7 +5,8 @@ Ingeniería Informático de la Universidad de Granada
 
 <img title="" src="docs/img/logo.png" alt="" data-align="center" width="120">
 
-El estado actual del proyecto puede ver en [Milestones](https://github.com/SrArtur/CC_22-23/milestones).
+El estado actual del proyecto puede ver en [Milestones](https://github.com/SrArtur/CC_22-23/milestones) y en el **nuevo
+apartado** [Estado del proyecto](#estado-del-proyecto)
 
 ---
 
@@ -21,144 +22,263 @@ En la documentación del proyecto podemos encontrar actualmente la siguiente inf
 
 - [Test.](https://github.com/SrArtur/CC_22-23/blob/main/docs/hito2.md)
 
-- [Creación de un contenedor para pruebas.](https://github.com/SrArtur/CC_22-23/blob/main/docs/hito3.md) (También
-  disponible a continuación)
+- [Creación de un contenedor para pruebas.](https://github.com/SrArtur/CC_22-23/blob/main/docs/hito3.md)
+
+- [Integración Continua](https://github.com/SrArtur/CC_22-23/blob/main/docs/hito4.md)
 
 ----
 
-## HITO 3 - Creación de un Contenedor para pruebas
+[![Build Status](https://app.travis-ci.com/SrArtur/CC_22-23.svg?branch=main)](https://app.travis-ci.com/SrArtur/CC_22-23)
+[![CircleCI](https://circleci.com/gh/SrArtur/CC_22-23.svg?style=svg)](https://app.circleci.com/pipelines/github/SrArtur/CC_22-23)
+## HITO 4 - Integración Continua
 
-Para la realización de esta práctica se ha
-consultado [Creación de un contenedor de pruebas](https://jj.github.io/CC/documentos/proyecto/3.Docker) del temario de
-la asignatura, además de la documentación de Docker detallada más adelante.
+Para la realización de este hito se ha seguido con detalle la documentación
+de [Cuarto HIto: Integración Continua](http://jj.github.io/CC/documentos/proyecto/4.CI.html).
 
-### Elección del contenedor base
+## Integración Continua con Travis
 
-Para la creación del `dockerfile` me he basado en la imagen de Python 3.9-slim que a su vez usa de base Debian 10-slim. La elección de esta imagen viene motivada por el poco uso de librerías que hace, únicamente instala las librerías base de Python. Por tanto, se obtiene un contenedor muy liviano de unos 150 MB.
+La elección de Travis viene justificada por familiaridad y fácil integración en el proyecto. Para ello se ha seguido
+la [guía de inicio](https://docs.travis-ci.com/user/tutorial/#to-get-started-with-travis-ci-using-github) que
+proporciona la propia plataforma. El primer paso es darse de alta en la plataforma y sincronizar con la cuenta de
+Github,así como con todos los repositorios, para futuros usos si es necesario (este proceso tarda un poco por la
+comunicación con Github).
 
-### Dockerfile y buenas prácticas
+Una vez completado el proceso, se deben ver los repositorios de tu cuenta en el menú de la izquierda. Para habilitar la
+integración continua, es necesario seleccionar un plan. En el caso de este proyecto se ha seleccionado el *Trial Plan*,
+ya que cumple de sobra los requisitos. Una vez finalizado este proceso, se pueden ver los créditos gratis que
+proporciona Travis, así como los usados hasta el momento (véase la siguiente figura). Es a partir de este momento,
+cuando ya tenemos la Integración Continua habilitada y es entonces, a partir del primer *push* a nuestro proyecto,
+cuando comenzará.
 
-El `dockerfile` se ha escrito acorde a la documentación de Docker, [_Build your
-image_](https://docs.docker.com/language/python/build-images/). Como se ha mencionado previamente, al usar esas imágenes base, apenas tiene programas necesarios instalados, es por ello que en el contenido del fichero se instalan programas necesarios, en este caso, git. El contenido del `dockerfile` es el siguiente:
+![](/docs/img/creditos.png)
 
-```dockerfile
-# syntax=docker/dockerfile:1
-FROM python:3.9-slim-buster
-RUN useradd -d /CC_22-23 CC_22-23
-RUN apt-get -y update
-# Instala git
-RUN apt-get -y install git
-# Crea el directorio sobre el que va el proyecto
-RUN mkdir /CC_22-23
-# Concedemos permisos de lectura
-RUN chown -R CC_22-23:CC_22-23 /CC_22-23
-USER CC_22-23
-RUN cd /CC_22-23
-# Clona la ultima versión del repositorio
-RUN git clone https://github.com/SrArtur/CC_22-23.git
-RUN cd /CC_22-23
+El archivo de configuración de Travis tienen el siguiente contenido:
+```yaml
+language: python
+python:
+  - "3.8"
+  - "3.9"
+install:
+  - pip install -r requirements.txt
+script:
+  - python -m unittest discover src/docker/test
+```
 
-WORKDIR .
+## Resultados obtenidos
 
-COPY requirements.txt requirements.txt
-RUN pip3 install -r requirements.txt
+En este caso, en el primer intento, no se consiguió la integración debido a dos motivos:
 
-COPY . .
-# Ejecuta los test específicos de docker
-# En caso de fallos, el contenedor no se construye
-RUN [ "python3" , "-m","unittest","discover","src/docker/test"]
+- <u>Incompatibilidad del módulo `iso8601`  y la versión 3.7 de Python</u>. Como consecuencia, hasta buscar una
+  alternativa, queda deshabilitada esta versión de Python del proyecto.
 
-CMD [ "python3" , "-m","unittest","discover","src/docker/test"]
+- <u>Variables de entorno no configuradas.</u> Para mantener a salvo elementos tan críticos como el token de la API o la
+  forma de acceder a la base de datos, es necesario configurar las variables de entorno. En este caso, se hizo uso de
+  Github Secrets para ello.
 
+![](/docs/img/test_fail.png)
+
+Una vez solventados ambos problemas, los test pasan correctamente y ya tenemos integración continua en el proyecto, como
+se puede apreciar
+en  [![Build Status](https://app.travis-ci.com/SrArtur/CC_22-23.svg?branch=main)](https://app.travis-ci.com/SrArtur/CC_22-23)
+y en las siguientes figuras.
+
+![](/docs/img/test_passing.png)
+
+# Integración continua con CircleCI
+
+Como alternativa gratuita a Travis, de manera complementaria se ha decidido usar CircleCI. La configuración ha sido muy similar a Travis, aunque el contenido de la plantilla difiere (Travis simplifica y da por hecho contenido que no es especificado). Su contenido es el siguiente:
+````yaml
+version: 2.1
+orbs:
+  python: circleci/python@1.5.0
+jobs:
+  build-and-test:
+    docker:
+      - image: cimg/python:3.9.2
+    steps:
+      - checkout
+      - python/install-packages:
+          pkg-manager: pip
+      - run:
+          name: Run tests
+          command: python -m unittest discover src/docker/test
+
+workflows:
+  sample: 
+    jobs:
+      - build-and-test
+````
+De la misma forma, al hacer `push`, se pasan los test. El resultado obtenido se puede ver en la siguiente figura aunque también en el _badge_ [![CircleCI](https://circleci.com/gh/SrArtur/CC_22-23.svg?style=svg)](https://app.circleci.com/pipelines/github/SrArtur/CC_22-23):
+
+![](/docs/img/circleci.png)
+
+# Estado del proyecto :chart_with_upwards_trend:
+
+A lo largo de la sucesión de los diferentes hitos de la asignatura, de manera paralela, se ha ido desarrollando código
+con el que se ha conseguido entre otros objetivos:
+
+- **Mostrar los precios de hoy** (referentes al 21 de Diciembre de 2022):
+
+```json
+{
+  '00': 0.10505,
+  '01': 0.09467,
+  '02': 0.08396,
+  '03': 0.08082,
+  '04': 0.0806,
+  '05': 0.09526,
+  '06': 0.1004,
+  '07': 0.10317,
+  '08': 0.14127,
+  '09': 0.14383,
+  '10': 0.18247,
+  '11': 0.1624,
+  '12': 0.16125,
+  '13': 0.15986,
+  '14': 0.11008,
+  '15': 0.11696,
+  '16': 0.13295,
+  '17': 0.14849,
+  '18': 0.20342,
+  '19': 0.20925,
+  '20': 0.21284,
+  '21': 0.20493,
+  '22': 0.13229,
+  '23': 0.12229
+}
+```
+
+- **Mostrar los precios de _cualquier_ día** (referentes al 17 de Diciembre de 2022)
+
+```json
+{
+  '00': 0.26835,
+  '01': 0.27927,
+  '02': 0.2849,
+  '03': 0.28072,
+  '04': 0.28241,
+  '05': 0.28505,
+  '06': 0.28181,
+  '07': 0.24923,
+  '08': 0.25343,
+  '09': 0.25165,
+  '10': 0.2304,
+  '11': 0.22588,
+  '12': 0.22316,
+  '13': 0.21906,
+  '14': 0.20781,
+  '15': 0.21082,
+  '16': 0.22949,
+  '17': 0.24474,
+  '18': 0.26244,
+  '19': 0.26311,
+  '20': 0.26308,
+  '21': 0.25414,
+  '22': 0.23954,
+  '23': 0.21826
+}
+```
+
+- **Precio medio de hoy** (referentes al 21 de Diciembre de 2022)
+
+```json
+"La media de hoy es 0.137"
+```
+
+- **Precio medio de _cualquier_ día**
+
+```json
+"La media de del día 17122022 es 0.2504"
+```
+
+- **Precio mínimo de hoy** (referentes al 21 de Diciembre de 2022)
+
+```json
+"El precio mínimo es a las 04 con 0.0806"
+```
+
+- **Precio minimo de _cualquier_ día**
+
+```json
+"El precio mínimo es a las 14 con 0.2078"
+```
+
+- **Clasificación de precios de hoy** (referentes al 21 de Diciembre de 2022)
+
+```json
+{
+  'valle': {
+    '00': 0.10505,
+    '01': 0.09467,
+    '02': 0.08396,
+    '03': 0.08082,
+    '04': 0.0806,
+    '05': 0.09526,
+    '06': 0.1004,
+    '07': 0.10317,
+    '14': 0.11008,
+    '15': 0.11696,
+    '23': 0.12229
+  },
+  'llano': {
+    '08': 0.14127,
+    '09': 0.14383,
+    '16': 0.13295,
+    '22': 0.13229
+  },
+  'punta': {
+    '10': 0.18247,
+    '11': 0.1624,
+    '12': 0.16125,
+    '13': 0.15986,
+    '17': 0.14849,
+    '18': 0.20342,
+    '19': 0.20925,
+    '20': 0.21284,
+    '21': 0.20493
+  }
+}
 
 ```
 
-Como se ha mostrado, se han seguido las buenas prácticas de Docker de la documentación [*Best practices for writing Dockerfiles | Docker Documentation*](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/).
+- **Clasificación de precios de cualquier día** (referentes al 17 de Diciembre de 2022)
 
-Para construir el contenedor, el comando y la salida por pantalla es la siguiente:
+```json
+{
+  'valle': {
+    '10': 0.2304,
+    '11': 0.22588,
+    '12': 0.22316,
+    '13': 0.21906,
+    '14': 0.20781,
+    '15': 0.21082,
+    '16': 0.22949,
+    '22': 0.23954,
+    '23': 0.21826
+  },
+  'llano': {
+    '07': 0.24923,
+    '08': 0.25343,
+    '09': 0.25165,
+    '17': 0.24474,
+    '21': 0.25414
+  },
+  'punta': {
+    '00': 0.26835,
+    '01': 0.27927,
+    '02': 0.2849,
+    '03': 0.28072,
+    '04': 0.28241,
+    '05': 0.28505,
+    '06': 0.28181,
+    '18': 0.26244,
+    '19': 0.26311,
+    '20': 0.26308
+  }
+}
 
-```shell
-C:\Users\aoa2e\Desktop\CC_22-23 > docker build --tag cc_22-23 .
-[+] Building 1.7s (22/22) FINISHED
- => [internal] load build definition from Dockerfile                                                               0.0s
- => => transferring dockerfile: 32B                                                                                0.0s
- => [internal] load .dockerignore                                                                                  0.0s
- => => transferring context: 2B                                                                                    0.0s
- => resolve image config for docker.io/docker/dockerfile:1                                                         0.6s
- => CACHED docker-image://docker.io/docker/dockerfile:1@sha256:9ba7531bd80fb0a858632727cf7a112fbfd19b17e94c4e84ce  0.0s
- => [internal] load .dockerignore                                                                                  0.0s
- => [internal] load build definition from Dockerfile                                                               0.0s
- => [internal] load metadata for docker.io/library/python:3.9-slim-buster                                          0.6s
- => [internal] load build context                                                                                  0.1s
- => => transferring context: 19.93kB                                                                               0.1s
- => [ 1/14] FROM docker.io/library/python:3.9-slim-buster@sha256:31b159250e058c356685e79a1ee427bb0d632064fe30e440  0.0s
- => CACHED [ 2/14] RUN useradd -d /CC_22-23 CC_22-23                                                               0.0s
- => CACHED [ 3/14] RUN apt-get -y update                                                                           0.0s
- => CACHED [ 4/14] RUN apt-get -y install git                                                                      0.0s
- => CACHED [ 5/14] RUN mkdir /CC_22-23                                                                             0.0s
- => CACHED [ 6/14] RUN chown -R CC_22-23:CC_22-23 /CC_22-23                                                        0.0s
- => CACHED [ 7/14] RUN cd /CC_22-23                                                                                0.0s
- => CACHED [ 8/14] RUN git clone https://github.com/SrArtur/CC_22-23.git                                           0.0s
- => CACHED [ 9/14] RUN cd /CC_22-23                                                                                0.0s
- => CACHED [10/14] COPY requirements.txt requirements.txt                                                          0.0s
- => CACHED [11/14] RUN pip3 install -r requirements.txt                                                            0.0s
- => CACHED [12/14] COPY . .                                                                                        0.0s
- => CACHED [13/14] RUN [ "python3" , "-m","unittest","discover","src/docker/test"]                                 0.0s
- => exporting to image                                                                                             0.1s
- => => exporting layers                                                                                            0.0s
- => => writing image sha256:2229efcf0c99baf0c441097d3b66389de453674ba440ee28f1a28a587c3ab39a                       0.0s
- => => naming to docker.io/library/cc_22-23
 ```
 
-Consiguiendo que la imagen final apenas ocupe 248 MB, tras instalar los requisitos del programa y git.
-
-Al ejecutar el contendor, debido que está destinado a pruebas, ejecutamos los test, de la siguiente forma:
-
-```bash
-C:\Users\aoa2e\Desktop\CC_22-23> docker run cc_22-23
-...
-----------------------------------------------------------------------
-Ran 3 tests in 0.001s
-
-OK
-```
-
-### Dockerhub
-
-Una vez completamos el `dockerfile` y se ha comprobado su correcto funcionamiento, subimos la imagen a un repositorio propio en Docker Hub. El respositorio es el siguiente:  [Docker Hub - CC-22-23](https://hub.docker.com/repository/docker/srarturo/cc_22-23/general). 
-
-Para subir la imagen:
-
-```shell
-C:\Users\aoa2e\Desktop\CC_22-23> docker tag cc_22-23:latest srarturo/cc_22-23:testing
-C:\Users\aoa2e\Desktop\CC_22-23> docker push srarturo/cc_22-23:testing
-The push refers to repository [docker.io/srarturo/cc_22-23]
-93230525d6ce: Pushed
-b00639565785: Pushed
-20268002c2b7: Pushed
-e3daba0ef532: Pushed
-b30f8fdf9787: Pushed
-b4546b938c54: Pushed
-bdb9b94ea761: Pushed
-be5fbc64a56c: Pushed
-9068fecf772d: Pushed
-277ebb90f471: Pushed
-97b29271e4e0: Pushed
-56ea3231b865: Pushed
-f48d51232399: Pushed
-5c39890b8729: Pushed
-2fa5cbc8f06d: Pushed
-4d5f738025a7: Pushed
-4c2b77c2cff5: Pushed
-testing: digest: sha256:33ff203fd1946f7e033456133f13df2a0f72e2193bc923ced6400484d3887027 size: 3873
-```
-
-
-
-Para descargar el contenedor: `docker pull srarturo/cc_22-23:base`
-
-> Debido a que mi nombre de usuario en Github (SrArtur) y el de Docker Hub (SrArturo) varían un poco, he incluido DOCKER_HUB_USERNAME
-
-### Registros alternativos
-
-Debido a la falta de tiempo, no ha sido posible completar este apartado para la entrega del hito 3.
+- **Gráfica de la evolución** (referentes a los días 17 y 21 de Diciembre de 2022). A la izquierda se muestra como varía el precio según el máximo y minimo de hoy, en la grafica de la derecha se observa de una manera más global.
+![21 de Diciembre](/docs/img/evolucion_precios_ambos.png)
+![17 de Diciembre](/docs/img/evolucion_precios_ambos_cualquier.png)
